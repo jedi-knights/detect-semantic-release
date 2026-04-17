@@ -1,9 +1,5 @@
-name: Detect Semantic Release
-description: >-
-  Wraps jedi-knights/go-semantic-release and exposes released/version/tag
-  outputs that the underlying action does not provide. Detects whether a
-  release actually occurred by comparing a version file before and after.
-author: jedi-knights
+name: 'Detect Semantic Release by Jedi Knights'
+description: 'Wraps go-semantic-release and exposes released/version/tag outputs — detects whether a release actually occurred by comparing a version file before and after.'
 
 branding:
   icon: tag
