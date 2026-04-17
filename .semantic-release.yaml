@@ -1,0 +1,20 @@
+branches:
+  - name: main
+    is_default: true
+
+tag_format: "v{{.Version}}"
+
+prepare:
+  changelog_file: CHANGELOG.md
+  version_file: VERSION
+
+git:
+  assets:
+    - CHANGELOG.md
+    - VERSION
+  message: "chore(release): {{.Version}} [skip ci]\n\n{{.Notes}}"
+
+github:
+  create_release: true
+  owner: jedi-knights
+  repo: detect-semantic-release

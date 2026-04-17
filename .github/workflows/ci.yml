@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Validate action.yml
+        run: python3 -c "import yaml, sys; yaml.safe_load(open('action.yml')); print('action.yml OK')"
+
+      - name: Validate .semantic-release.yaml
+        run: python3 -c "import yaml, sys; yaml.safe_load(open('.semantic-release.yaml')); print('.semantic-release.yaml OK')"
+
+  ci:
+    if: always()
+    needs: [validate]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check results
+        run: |
+          if [[ "${{ needs.validate.result }}" == "failure" ]]; then
+            exit 1
+          fi

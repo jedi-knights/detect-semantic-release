@@ -1,0 +1,66 @@
+name: Detect Semantic Release
+description: >-
+  Wraps jedi-knights/go-semantic-release and exposes released/version/tag
+  outputs that the underlying action does not provide. Detects whether a
+  release actually occurred by comparing a version file before and after.
+author: jedi-knights
+
+branding:
+  icon: tag
+  color: blue
+
+inputs:
+  github_token:
+    description: GitHub token for semantic-release API calls and git operations.
+    required: true
+  version_file:
+    description: Path to the file whose content changes when a new version is released.
+    required: false
+    default: VERSION
+  args:
+    description: Additional arguments to pass to go-semantic-release (e.g. --dry-run).
+    required: false
+    default: ''
+
+outputs:
+  released:
+    description: '"true" if a new version was released, "false" otherwise.'
+    value: ${{ steps.detect.outputs.released }}
+  version:
+    description: The new version number (e.g. "1.2.3"). Empty string if no release.
+    value: ${{ steps.detect.outputs.version }}
+  tag:
+    description: The new git tag (e.g. "v1.2.3"). Empty string if no release.
+    value: ${{ steps.detect.outputs.tag }}
+
+runs:
+  using: composite
+  steps:
+    - name: Capture pre-release version
+      id: pre
+      shell: bash
+      run: |
+        [ -f "${{ inputs.version_file }}" ] || { echo "ERROR: version file '${{ inputs.version_file }}' not found"; exit 1; }
+        echo "version=$(cat '${{ inputs.version_file }}')" >> $GITHUB_OUTPUT
+
+    - name: Run semantic release
+      uses: jedi-knights/go-semantic-release@v0
+      with:
+        github_token: ${{ inputs.github_token }}
+        args: ${{ inputs.args }}
+
+    - name: Detect new release
+      id: detect
+      shell: bash
+      run: |
+        OLD="${{ steps.pre.outputs.version }}"
+        NEW="$(cat '${{ inputs.version_file }}')"
+        if [ "$NEW" != "$OLD" ]; then
+          echo "released=true"  >> $GITHUB_OUTPUT
+          echo "version=$NEW"   >> $GITHUB_OUTPUT
+          echo "tag=v$NEW"      >> $GITHUB_OUTPUT
+        else
+          echo "released=false" >> $GITHUB_OUTPUT
+          echo "version="       >> $GITHUB_OUTPUT
+          echo "tag="           >> $GITHUB_OUTPUT
+        fi
