@@ -1,7 +1,5 @@
 # detect-semantic-release
 
-[![Coverage](https://img.shields.io/badge/Coverage-0%25-red)](https://jedi-knights.github.io/detect-semantic-release/)
-
 A GitHub Action that wraps [`jedi-knights/go-semantic-release`](https://github.com/jedi-knights/go-semantic-release) and exposes `released`, `version`, and `tag` outputs — which the underlying action does not provide.
 
 ## Why
